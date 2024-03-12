@@ -13,9 +13,13 @@ def list_releases(username, repo):
 
     response_json = json.loads((response.content))
 
+    release_tag = response_json.get("tag_name")
     assets = response_json.get("assets")
 
+    print(f"The latest release version / tag: {release_tag}")
     print(f"There are {len(assets)} assets available in the latest release.")
     
+    x = 1
     for asset in assets:
-        print(asset["name"])
+        print(f"{x}. {asset["name"]}")
+        x += 1
