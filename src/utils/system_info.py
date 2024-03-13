@@ -1,7 +1,8 @@
-import platform
 import logging
+import platform
 
 from . import json
+
 
 def get_system_info():
     try:

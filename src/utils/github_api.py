@@ -1,5 +1,7 @@
 import requests
+
 from . import json
+
 
 # Fetch the list of assets of latest release for a given repository
 def list_releases(username, repo):

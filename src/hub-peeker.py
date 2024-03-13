@@ -1,9 +1,6 @@
 import argparse
 
-from utils import json
-from utils import github_api
-from utils import system_info
-
+from utils import github_api, json, system_info
 
 # github_api.list_releases(username, repo)
 
