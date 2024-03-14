@@ -23,5 +23,5 @@ def list_releases(username, repo):
     
     x = 1
     for asset in assets:
-        print(f"{x}. {asset["name"]}")
+        print(f'{x}. {asset["name"]}')
         x += 1
