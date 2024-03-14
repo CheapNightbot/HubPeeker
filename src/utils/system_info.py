@@ -5,6 +5,7 @@ from . import json
 
 
 def get_system_info():
+    """Return system information as a dictionary."""
     try:
         info={}
         info['platform']=platform.system().lower()

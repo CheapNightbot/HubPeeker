@@ -3,8 +3,16 @@ import requests
 from . import json
 
 
-# Fetch the list of assets of latest release for a given repository
-def list_releases(username, repo):
+def list_releases(username: str, repo: str):
+    """Fetch the list of assets of latest release for a given GitHub repository.
+
+    Args:
+        - `username` (str): GitHub Username
+        - `repo` (str): GitHub Repository name
+
+    Returns:
+        _type_: _description_
+    """
 
     url = f"https://api.github.com/repos/{username}/{repo}/releases/latest"
     response = requests.get(url)
