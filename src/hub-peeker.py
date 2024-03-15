@@ -21,6 +21,11 @@ def list_releases(assets: list):
     while True:
         select_asset = int(input(f"Please select a release to downloaded (1-{asset_len}): "))
         
+        match select_asset:
+            case 0:
+                print("You are not computer, count from `1`! <( ￣^￣)(θ(θ☆( >_<")
+                continue
+
         if select_asset > asset_len:
             print(f"There are only {asset_len} assets and you selected {select_asset}, why (´･ω･`)?")
             continue
