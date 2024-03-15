@@ -9,8 +9,12 @@ def get_system_info():
     try:
         info={}
         info['platform']=platform.system().lower()
-        info['platform-release']=platform.release().lower()
         info['architecture']=[platform.machine().lower(), platform.architecture()[0].lower()]
+
+        for arch in info.get('architecture'):
+            if "64" in arch:
+                info['architecture'].append("x86_64")
+                break
 
         return json.dumps(info)
     except Exception as e:
