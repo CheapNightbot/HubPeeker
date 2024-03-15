@@ -4,7 +4,12 @@ from utils import github_api
 
 
 def list_releases(assets: list):
+    """Print assets from the list returned by `github_api.fetch_assets()` function.
+    Prompt user to select an asset and print download URL of selected asset.
 
+    Args:
+        - `assets` (list): List of assets. Each asset is a dictionary.
+    """
     asset_len = len(assets)
 
     for asset in assets:
