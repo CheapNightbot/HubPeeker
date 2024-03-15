@@ -3,7 +3,7 @@ import requests
 from . import json
 
 
-def list_releases(username: str, repo: str):
+def fetch_assets(username: str, repo: str) -> list:
     """Fetch the list of assets of latest release for a given GitHub repository.
 
     Args:
@@ -11,7 +11,7 @@ def list_releases(username: str, repo: str):
         - `repo` (str): GitHub Repository name
 
     Returns:
-        _type_: _description_
+       - `list`: Return dictionary of assets inside a list.
     """
 
     url = f"https://api.github.com/repos/{username}/{repo}/releases/latest"
@@ -23,13 +23,20 @@ def list_releases(username: str, repo: str):
 
     response_json = json.loads((response.content))
 
-    release_tag = response_json.get("tag_name")
-    assets = response_json.get("assets")
+    print(f"The latest release version / tag: {response_json.get("tag_name")}")
+    print(f"There are {len(response_json.get("assets"))} assets available in the latest release.")
 
-    print(f"The latest release version / tag: {release_tag}")
-    print(f"There are {len(assets)} assets available in the latest release.")
-    
-    x = 1
-    for asset in assets:
-        print(f'{x}. {asset["name"]}')
-        x += 1
+    assets = []
+    asset_number = 1
+
+    for x in response_json.get("assets"):
+        asset = {}
+        asset['number'] = asset_number
+        asset['name'] = x.get("name")
+        asset['asset_type'] = x.get("content_type")
+        asset['asset_size'] = x.get("size")
+        asset['download_url'] = x.get("browser_download_url")
+        assets.append(asset)
+        asset_number += 1
+
+    return assets

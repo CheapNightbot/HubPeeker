@@ -1,6 +1,6 @@
 import argparse
 
-from utils import github_api, json, system_info
+from utils import github_api
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--username")
@@ -17,9 +17,13 @@ if args.interactive:
     username = input("GitHub Username: ")
     repo = input("GitHub Repository Name: ")
 
-print(f"username: {username} and repository: {repo}")
+if username and repo != None:
+    print(f"username: {username} and repository: {repo}")
 
-github_api.list_releases(username, repo)
+    assets = github_api.fetch_assets(username, repo)
 
-system_info = json.loads(system_info.get_system_info())
-print(system_info.get('platform'))
+    for asset in assets:
+        print(f"{asset.get('number')}. {asset.get('name')} --> {asset.get('download_url')} \n>>Downlaod Size:{asset.get('asset_size')} - content-type: {asset.get('asset_type')}")
+
+else:
+    print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
