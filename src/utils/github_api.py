@@ -23,8 +23,8 @@ def fetch_assets(username: str, repo: str) -> list:
 
     response_json = json.loads((response.content))
 
-    print(f"The latest release version / tag: {response_json.get("tag_name")}")
-    print(f"There are {len(response_json.get("assets"))} assets available in the latest release.")
+    print(f"The latest release version / tag: {response_json.get('tag_name')}")
+    print(f"There are {len(response_json.get('assets'))} assets available in the latest release.")
     
     user_system_info = json.loads(system_info.get_system_info())
     user_os = user_system_info.get("platform")
