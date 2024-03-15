@@ -19,11 +19,11 @@ def list_releases(assets: list):
         print(f"{asset.get('number')}. {asset.get('name')} {recommend}")
 
     while True:
-        select_asset = int(input(f"Please select a release to downloaded (1-{asset_len}): "))
+        select_asset = int(input(f"\nPlease select a release to downloaded (1-{asset_len}): "))
         
         match select_asset:
             case 0:
-                print("You are not computer, count from `1`! <( ￣^￣)(θ(θ☆( >_<")
+                print("You are not a computer, count from 1 ~! (ｏ ‵-′)ノ”(ノ﹏<。)")
                 continue
 
         if select_asset > asset_len:
