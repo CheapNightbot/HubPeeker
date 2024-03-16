@@ -10,6 +10,23 @@ def list_releases(assets: list):
     Args:
         - `assets` (list): List of assets. Each asset is a dictionary.
     """
+    try:
+        response_code = assets.get('Response code')
+        if response_code != 200 and response_code != None:
+            match response_code:
+                case 404:
+                    print("Resource not found.")
+            print("Looks like this repository does not have any releases or assets. (￣_￣|||)")
+            return
+    except:
+        pass
+    try:
+        response_msg = assets.get('Bad response')
+        print(response_msg)
+        return
+    except:
+        pass
+
     asset_len = len(assets)
 
     for asset in assets:

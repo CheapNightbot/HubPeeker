@@ -3,6 +3,37 @@ import requests
 from . import json, system_info
 
 
+def validate_username_repo(username:str, repo:str):
+    """Check if the given Username (user) and Repository exist on GitHub
+
+    Args:
+        - `username` (str): GitHub Username
+        - `repo` (str): GitHub Repository name
+
+    Returns:
+        - `dict`: Return appropriate (pre-defined) message based on recieved response code as dictionary.
+        - `200`: If given `username` and `repository` exists on GitHub, return `200`.
+    """
+    url = f"https://api.github.com/users/{username}"
+    headers = {'accept': 'application/vnd.github+json'}
+    response = requests.get(url, headers)
+    
+    if response.status_code != requests.codes.ok:
+        match response.status_code:
+            case 403:
+                return {'Bad response': "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."}
+        return {'Bad response': f"Couldn't find this user with username: `{username}` on GitHub.\nMake sure you have entered the correct spelling."}
+    else:
+        url = f"https://api.github.com/repos/{username}/{repo}"
+        headers = {'accept': 'application/vnd.github+json'}
+        response = requests.get(url, headers)
+
+        if response.status_code != requests.codes.ok:
+            return {'Bad response': f"Couldn't find this Repository `{repo}` under this `{username}` username.\nMake sure you have entered the correct spelling.\nAlso, please note that this CLI Application (currently) doesn't support downloading assets from Private Repositories. Thank you for your understanding!"}
+        else:
+            return requests.codes.ok
+
+
 def fetch_assets(username: str, repo: str) -> list:
     """Fetch the list of assets of latest release for a given GitHub repository.
 
@@ -11,17 +42,26 @@ def fetch_assets(username: str, repo: str) -> list:
         - `repo` (str): GitHub Repository name
 
     Returns:
-       - `list`: Return dictionary of assets inside a list.
+       - `list`: Return dictionary of assets inside a list. 
+       If something goes wrong, return error message as dictionary.
     """
 
+    check_user_repo = validate_username_repo(username, repo)
+    if check_user_repo != 200:
+        return check_user_repo
+
     url = f"https://api.github.com/repos/{username}/{repo}/releases/latest"
-    response = requests.get(url)
+    headers = {'accept': 'application/vnd.github+json'}
+    response = requests.get(url, headers)
     
     if response.status_code != requests.codes.ok:
-        print("OH MA BOT, couldn't get data from GitHub.")
-        return f'Response code: {response.status_code}'
+        match response.status_code:
+            case 403:
+                 return {'Bad response': "API rate limit exceeded for you IP. Please try after some time."}
+        response_code = {'Response code': response.status_code}
+        return response_code
 
-    response_json = json.loads((response.content))
+    response_json = json.loads(response.content)
 
     print(f"The latest release version / tag: {response_json.get('tag_name')}")
     print(f"There are {len(response_json.get('assets'))} assets available in the latest release.\n")
