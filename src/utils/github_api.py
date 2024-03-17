@@ -2,6 +2,11 @@ import requests
 
 from . import json, system_info
 
+# Create variables for `headers` and "Bad response"
+# 'cause these were being repeated several times through out
+# this file and "SonarLint" was annoying me with warning. ￣へ￣
+headers = {'accept': 'application/vnd.github+json'}
+response_key = "Bad response"
 
 def validate_username_repo(username:str, repo:str):
     """Check if the given Username (user) and Repository exist on GitHub
@@ -15,26 +20,28 @@ def validate_username_repo(username:str, repo:str):
         - `200`: If given `username` and `repository` exists on GitHub, return `200`.
     """
     url = f"https://api.github.com/users/{username}"
-    headers = {'accept': 'application/vnd.github+json'}
-    response = requests.get(url, headers)
+
+    try:
+        response = requests.get(url, headers)
+    except ConnectionError:
+        return  {f'{response_key}': "Connection Error! Make sure you are connected to the internet and try again. X﹏X"}
     
     if response.status_code != requests.codes.ok:
         match response.status_code:
             case 403:
-                return {'Bad response': "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."}
-        return {'Bad response': f"Couldn't find this user with username: `{username}` on GitHub.\nMake sure you have entered the correct spelling."}
+                return {f'{response_key}': "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."}
+        return {f'{response_key}': f"Couldn't find this user with username `{username}` on GitHub.\nMake sure you have entered the correct spelling."}
     else:
         url = f"https://api.github.com/repos/{username}/{repo}"
-        headers = {'accept': 'application/vnd.github+json'}
         response = requests.get(url, headers)
 
         if response.status_code != requests.codes.ok:
-            return {'Bad response': f"Couldn't find this Repository `{repo}` under this `{username}` username.\nMake sure you have entered the correct spelling.\nAlso, please note that this CLI Application (currently) doesn't support downloading assets from Private Repositories. Thank you for your understanding!"}
+            return {f'{response_key}': f"Couldn't find this Repository `{repo}` under this `{username}` username.\nMake sure you have entered the correct spelling.\nAlso, please note that this CLI Application (currently) doesn't support downloading assets from Private Repositories. Thank you for your understanding!"}
         else:
             return requests.codes.ok
 
 
-def fetch_assets(username: str, repo: str) -> list:
+def fetch_assets(username: str, repo: str) -> list | dict:
     """Fetch the list of assets of latest release for a given GitHub repository.
 
     Args:
@@ -43,7 +50,7 @@ def fetch_assets(username: str, repo: str) -> list:
 
     Returns:
        - `list`: Return dictionary of assets inside a list. 
-       If something goes wrong, return error message as dictionary.
+       - `dict`: If something goes wrong, return error message as dictionary.
     """
 
     check_user_repo = validate_username_repo(username, repo)
@@ -51,13 +58,16 @@ def fetch_assets(username: str, repo: str) -> list:
         return check_user_repo
 
     url = f"https://api.github.com/repos/{username}/{repo}/releases/latest"
-    headers = {'accept': 'application/vnd.github+json'}
-    response = requests.get(url, headers)
+    
+    try:
+        response = requests.get(url, headers)
+    except ConnectionError:
+        return  {f'{response_key}': "Connection Error! Make sure you are connected to the internet and try again. X﹏X"}
     
     if response.status_code != requests.codes.ok:
         match response.status_code:
             case 403:
-                 return {'Bad response': "API rate limit exceeded for you IP. Please try after some time."}
+                 return {f'{response_key}': "API rate limit exceeded for you IP. Please try after some time."}
         response_code = {'Response code': response.status_code}
         return response_code
 
@@ -75,9 +85,12 @@ def fetch_assets(username: str, repo: str) -> list:
 
     for x in response_json.get("assets"):
         asset = {}
-        asset['number'] = asset_number
-        asset['name'] = x.get("name")
-        asset['download_url'] = x.get("browser_download_url")
+        asset['username'] = username
+        asset['repo'] = repo
+        asset['release_version'] = response_json.get('tag_name')
+        asset['asset_number'] = asset_number
+        asset['asset_name'] = x.get("name")
+        asset['asset_download_url'] = x.get("browser_download_url")
         asset['asset_size'] = x.get("size")
         asset['asset_type'] = x.get("content_type")
         
