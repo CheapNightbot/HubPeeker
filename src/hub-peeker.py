@@ -3,14 +3,18 @@ import argparse
 from utils import github_api, json
 
 
-def list_releases(assets: list):
+def list_releases(username: str, repo: str):
     """Print assets from the list returned by `github_api.fetch_assets()` function.
     Prompt user to select an asset and print download URL of selected asset.
-    Save import information (such as, release version) to a `.json` file.
+    Save important information (such as, release version) to a `.json` file.
 
     Args:
-        - `assets` (list): List of assets. Each asset is a dictionary.
+        - `username` (str): GitHub Username
+        - `repo` (str): GitHub Repository name
     """
+
+    assets = github_api.fetch_assets(username, repo)
+
     try:
         asset_len = len(assets)
 
@@ -34,7 +38,8 @@ def list_releases(assets: list):
             asset_number = select_asset - 1
 
             print(assets[asset_number].get('asset_download_url'))
-            return asset_number
+            save_release_info(asset_number, assets)
+            return
 
     except Exception:
         response_code = assets.get('Response code')
@@ -49,30 +54,36 @@ def list_releases(assets: list):
         print(response_msg)
         return
 
-def save_release_info(asset_number: int):
+def save_release_info(asset_number: int, assets: list):
+    """Save user selected asset's release information to a `.json` file.
 
+    Args:
+        - `asset_number` (int): User selected asset's number (index).
+        - `assets` (list): List return by `github_api.fetch_release()` function.
+    """
     if asset_number == None:
         return
 
     asset_data = {
         f"{assets[asset_number].get('username')}": {
-
             f"{assets[asset_number].get('repo')}": {
-
                 "version": f"{assets[asset_number].get('release_version')}",
                 "asset_name": f"{assets[asset_number].get('asset_name')}",
-                    "asset_type": f"{assets[asset_number].get('asset_type')}",
-                    "asset_download_url": f"{assets[asset_number].get('asset_download_url')}",
-                    "os": "windows"
-                }
+                "asset_type": f"{assets[asset_number].get('asset_type')}",
+                "asset_download_url": f"{assets[asset_number].get('asset_download_url')}",
+                "os": f"{assets[asset_number].get('user_os')}",
+                "arch": f"{assets[asset_number].get('user_arch')}"
             }
         }
+    }
 
     asset_data_json = json.dumps(asset_data, indent=4)
 
     with open('assets.json', 'w') as outfile:
         outfile.write(asset_data_json)
 
+
+#########################################################
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--username")
@@ -85,7 +96,6 @@ args = parser.parse_args()
 username = args.username
 repo = args.repo
 
-
 if args.interactive:
     username = input("GitHub Username: ")
     repo = input("GitHub Repository Name: ")
@@ -93,9 +103,7 @@ if args.interactive:
 if username and repo != None:
     print(f"Checking release assets for `https://github.com/{username}/{repo}`")
 
-    assets = github_api.fetch_assets(username, repo)
-    user_select_asset = list_releases(assets)
-    save_release_info(user_select_asset)
+    list_releases(username, repo)
 
 else:
     print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
