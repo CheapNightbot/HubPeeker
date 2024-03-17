@@ -94,7 +94,6 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         asset['asset_size'] = x.get("size")
         asset['asset_type'] = x.get("content_type")
         asset['user_os'] = user_os
-        asset['user_arch'] = user_arch
         
         """
         If `user_os` (returned by `system_info.get_system_info()` function) string literal (e.g.: 'windows', 'linux')
@@ -106,6 +105,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         if user_os in x.get("name").lower():
             for arch in user_arch:
                 if arch in x.get("name").lower():
+                    asset['user_arch'] = arch
                     recommend = True
                     # maybe there are 3 architecture in `user_arch` (i.e.: 'amd64', 'x64', etc.).
                     # so, if it matches with the first or maybe second one, don't check for further
