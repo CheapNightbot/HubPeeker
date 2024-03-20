@@ -47,6 +47,7 @@ def list_releases(username: str, repo: str):
                 download_asset(download_url, asset_filename, user_os)
                 return
             except KeyboardInterrupt:
+                print("\n")
                 exit(1)
 
     except Exception:
