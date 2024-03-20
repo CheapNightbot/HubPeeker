@@ -89,6 +89,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         asset['asset_number'] = asset_number
         asset['asset_name'] = x.get("name")
         asset['asset_download_url'] = x.get("browser_download_url")
+        asset['asset_size'] = x.get("size")
         asset['asset_type'] = x.get("content_type")
         asset['user_os'] = user_os
         

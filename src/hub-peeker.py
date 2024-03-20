@@ -24,28 +24,30 @@ def list_releases(username: str, repo: str):
         for asset in assets:
             recommend = ""
             if asset.get('recommend'):
-                recommend = "[RECOMMENDED]"
-            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} {recommend}")
+                recommend = "\033[92m[RECOMMENDED]\033[0m"
+            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({size_of_fmt.format_file_size(asset.get('asset_size'))}) {recommend}")
 
         while True:
-            select_asset = int(input(f"\nPlease select a release to downloaded (1-{asset_len}): "))
-            
-            match select_asset:
-                case 0:
-                    print("You are not a computer, count from 1 ~! (ｏ ‵-′)ノ”(ノ﹏<。)")
+            try:
+                select_asset = int(input(f"\nPlease select a release to downloaded (1-{asset_len}): "))
+                
+                match select_asset:
+                    case 0:
+                        print("You are not a computer, count from 1 ~! (ｏ ‵-′)ノ”(ノ﹏<。)")
+                        continue
+
+                if select_asset > asset_len:
+                    print(f"There are only {asset_len} assets and you selected {select_asset}, why (´･ω･`)?")
                     continue
+                asset_number = select_asset - 1
 
-            if select_asset > asset_len:
-                print(f"There are only {asset_len} assets and you selected {select_asset}, why (´･ω･`)?")
-                continue
-            asset_number = select_asset - 1
-
-            download_url = assets[asset_number].get('asset_download_url')
-            asset_filename = assets[asset_number].get('asset_name')
-            user_os = assets[asset_number].get('user_os')
-            # save_release_info(asset_number, assets)
-            download_asset(download_url, asset_filename, user_os)
-            return
+                download_url = assets[asset_number].get('asset_download_url')
+                asset_filename = assets[asset_number].get('asset_name')
+                user_os = assets[asset_number].get('user_os')
+                download_asset(download_url, asset_filename, user_os)
+                return
+            except KeyboardInterrupt:
+                exit(1)
 
     except Exception:
         response_code = assets.get('Response code')
@@ -60,37 +62,18 @@ def list_releases(username: str, repo: str):
         print(response_msg)
         return
 
-# def save_release_info(asset_number: int, assets: list):
-#     """Save user selected asset's release information to a `.json` file.
-
-#     Args:
-#         - `asset_number` (int): User selected asset's number (index).
-#         - `assets` (list): List return by `github_api.fetch_release()` function.
-#     """
-#     if asset_number == None:
-#         return
-   
-#     asset_data = {
-#         f"{assets[asset_number].get('username')}": {
-#             f"{assets[asset_number].get('repo')}": {
-#                 "version": f"{assets[asset_number].get('release_version')}",
-#                 "asset_name": f"{assets[asset_number].get('asset_name')}",
-#                 "asset_type": f"{assets[asset_number].get('asset_type')}",
-#                 "asset_download_url": f"{assets[asset_number].get('asset_download_url')}",
-#                 "os": f"{assets[asset_number].get('user_os')}",
-#                 "arch": f"{assets[asset_number].get('user_arch')}"
-#             }
-#         }
-#     }
-
-#     asset_data_json = json.dumps(asset_data, indent=4)
-
-#     with open(f'{assets_data}', 'w') as outfile:
-#         outfile.write(asset_data_json)
-
 
 def download_asset(asset_download_url: str, filename: str, user_os: str):
+    """Download Asset into user's `Download` directory, inside `HubPeeker` sub-directory.
 
+    Args:
+        - `asset_download_url` (str): Asset download URL.
+        - `filename` (str): Asset will be saved with this name.
+        - `user_os` (str): User's Operating System (i.e.: Windows or Linux).
+
+    Returns:
+        - `str`: Return string literal 'success' after successfully downloading asset.
+    """
     # Check whether user in on "Windows" OR "Linux"
     # and download to user's "Download" directory.
     if user_os == 'windows':
@@ -117,42 +100,34 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
     # Start the timer to calculate ETA and stuff..
     start_time = time.time()
 
-    # Download the file with progress bar
-    progress = 0
-    with open(file_path, 'wb') as fd:
-        for chunk in response.iter_content(chunk_size=1024):
-            fd.write(chunk)
-            progress += len(chunk)
-            # Calculate the elapsed time and the estimated time remaining
-            elapsed_time = time.time() - start_time
-            eta = (file_size - progress) / progress * elapsed_time
-            # Print out the progress bar with ETA
-            print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
-                size_of_fmt.format_file_size(progress),
-                size_of_fmt.format_file_size(file_size),
-                f'{progress_bar}'*int(progress*50/file_size),
-                int(progress*100/file_size),
-                eta
-            ), end='')
+    try:
+        # Download the file with progress bar
+        progress = 0
+        with open(file_path, 'wb') as fd:
+            for chunk in response.iter_content(chunk_size=1024):
+                fd.write(chunk)
+                progress += len(chunk)
+                # Calculate the elapsed time and the estimated time remaining
+                elapsed_time = time.time() - start_time
+                eta = (file_size - progress) / progress * elapsed_time
+                # Print out the progress bar with ETA
+                print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
+                    size_of_fmt.format_file_size(progress),
+                    size_of_fmt.format_file_size(file_size),
+                    f'{progress_bar}'*int(progress*50/file_size),
+                    int(progress*100/file_size),
+                    eta
+                ), end='')
 
-        print()
-        # Calculate the total time taken for the download
-        total_time = time.time() - start_time
-        print("Download finished in %ds" % total_time)
-    
-    return "success"
-
-
-# def check_updates():
-
-#     if path.exists():
-#         print("`assets.json` exists, checking for updates will be helpful.")
-#         with open(f'{path}', 'r') as openfile:
-#             assets = json.load(openfile)
-
-#         print(assets.get(f'{username}').get(f'{repo}').get('version'))
-#     else:
-#         print("couldn't find `assets.json`, let's download something first to make history.")
+            print()
+            # Calculate the total time taken for the download
+            total_time = time.time() - start_time
+            print("Download finished in %ds" % total_time)
+        
+        return "success"
+    except KeyboardInterrupt:
+        print("\nDownload has been cancelled!\nNOTE: This application does not support the resumption of downloads. If you initiate a download again (even for the same asset), it will start from the beginning and overwrite any previously downloaded content.")
+        return "failed"
 
 
 #########################################################
@@ -200,6 +175,7 @@ def main():
 
     else:
         parser.exit(status=1, message="Please provide with the <USERNAME> and <REPO>!\nRun `hub-peeker -h` for usage information.\n")
+
 
 if __name__ == '__main__':
     main()
