@@ -1,7 +1,7 @@
 import argparse
 import os
 import time
-from pathlib import Path
+# from pathlib import Path
 
 from utils import __version__, github_api, requests, size_of_fmt
 
