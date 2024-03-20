@@ -158,9 +158,10 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
 #########################################################
 
 parser = argparse.ArgumentParser(
-    prog="hub-peeker", 
+    prog="hub-peeker",
     usage="%(prog)s [options...]",
-    description="Download Assets from GitHub Releases.", 
+    description="Download Assets from GitHub Releases.",
+    allow_abbrev=False,
     epilog=f"""
 Usage examples:
   - hub-peeker -u 'username' -r 'repo'
