@@ -9,7 +9,6 @@ from utils import __version__, github_api, requests, size_of_fmt
 def list_releases(username: str, repo: str):
     """Print assets from the list returned by `github_api.fetch_assets()` function.
     Prompt user to select an asset and print download URL of selected asset.
-    Save important information (such as, release version) to a `.json` file.
 
     Args:
         - `username` (str): GitHub Username
@@ -73,7 +72,7 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
         - `user_os` (str): User's Operating System (i.e.: Windows or Linux).
 
     Returns:
-        - `str`: Return string literal 'success' after successfully downloading asset.
+        - `str`: Return string literal 'success' after successfully downloading asset or 'failed' if user interrupts it.
     """
     # Check whether user in on "Windows" OR "Linux"
     # and download to user's "Download" directory.
