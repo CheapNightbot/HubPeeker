@@ -1,6 +1,4 @@
-import requests
-
-from . import json, system_info
+from . import json, requests, system_info
 
 # Create variables for `headers` and "Bad response"
 # 'cause these were being repeated several times through out
@@ -67,7 +65,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     if response.status_code != requests.codes.ok:
         match response.status_code:
             case 403:
-                 return {f'{response_key}': "API rate limit exceeded for you IP. Please try after some time."}
+                return {f'{response_key}': "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."}
         response_code = {'Response code': response.status_code}
         return response_code
 
@@ -91,7 +89,6 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         asset['asset_number'] = asset_number
         asset['asset_name'] = x.get("name")
         asset['asset_download_url'] = x.get("browser_download_url")
-        asset['asset_size'] = x.get("size")
         asset['asset_type'] = x.get("content_type")
         asset['user_os'] = user_os
         

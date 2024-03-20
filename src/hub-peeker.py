@@ -1,7 +1,11 @@
 import argparse
+import os
+import time
+from pathlib import Path
 
-from utils import github_api, json
+from utils import github_api, json, requests, size_of_fmt
 
+assets_data = Path("./src/assets.json")
 
 def list_releases(username: str, repo: str):
     """Print assets from the list returned by `github_api.fetch_assets()` function.
@@ -37,8 +41,11 @@ def list_releases(username: str, repo: str):
                 continue
             asset_number = select_asset - 1
 
-            print(assets[asset_number].get('asset_download_url'))
-            save_release_info(asset_number, assets)
+            download_url = assets[asset_number].get('asset_download_url')
+            asset_filename = assets[asset_number].get('asset_name')
+            user_os = assets[asset_number].get('user_os')
+            # save_release_info(asset_number, assets)
+            download_asset(download_url, asset_filename, user_os)
             return
 
     except Exception:
@@ -54,33 +61,95 @@ def list_releases(username: str, repo: str):
         print(response_msg)
         return
 
-def save_release_info(asset_number: int, assets: list):
-    """Save user selected asset's release information to a `.json` file.
+# def save_release_info(asset_number: int, assets: list):
+#     """Save user selected asset's release information to a `.json` file.
 
-    Args:
-        - `asset_number` (int): User selected asset's number (index).
-        - `assets` (list): List return by `github_api.fetch_release()` function.
-    """
-    if asset_number == None:
-        return
+#     Args:
+#         - `asset_number` (int): User selected asset's number (index).
+#         - `assets` (list): List return by `github_api.fetch_release()` function.
+#     """
+#     if asset_number == None:
+#         return
+   
+#     asset_data = {
+#         f"{assets[asset_number].get('username')}": {
+#             f"{assets[asset_number].get('repo')}": {
+#                 "version": f"{assets[asset_number].get('release_version')}",
+#                 "asset_name": f"{assets[asset_number].get('asset_name')}",
+#                 "asset_type": f"{assets[asset_number].get('asset_type')}",
+#                 "asset_download_url": f"{assets[asset_number].get('asset_download_url')}",
+#                 "os": f"{assets[asset_number].get('user_os')}",
+#                 "arch": f"{assets[asset_number].get('user_arch')}"
+#             }
+#         }
+#     }
 
-    asset_data = {
-        f"{assets[asset_number].get('username')}": {
-            f"{assets[asset_number].get('repo')}": {
-                "version": f"{assets[asset_number].get('release_version')}",
-                "asset_name": f"{assets[asset_number].get('asset_name')}",
-                "asset_type": f"{assets[asset_number].get('asset_type')}",
-                "asset_download_url": f"{assets[asset_number].get('asset_download_url')}",
-                "os": f"{assets[asset_number].get('user_os')}",
-                "arch": f"{assets[asset_number].get('user_arch')}"
-            }
-        }
-    }
+#     asset_data_json = json.dumps(asset_data, indent=4)
 
-    asset_data_json = json.dumps(asset_data, indent=4)
+#     with open(f'{assets_data}', 'w') as outfile:
+#         outfile.write(asset_data_json)
 
-    with open('assets.json', 'w') as outfile:
-        outfile.write(asset_data_json)
+
+def download_asset(asset_download_url: str, filename: str, user_os: str):
+
+    # Check whether user in on "Windows" OR "Linux"
+    # and download to user's "Download" directory.
+    if user_os == 'windows':
+        download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+    elif user_os == 'linux':
+        download_dir = os.path.expanduser('~/Downloads')
+
+    # Create a subdirectory inside user's "Download" directory.
+    subdirectory = "HubPeeker"
+    full_path = os.path.join(download_dir, subdirectory)
+    os.makedirs(full_path, exist_ok=True)
+    
+    # This is the path where the asset will be saved / downloaded.
+    # "~/Downloads/HubPeeker/<asset_name>" OR "/home/<username>/Downloads/HubPeeker/<asset_name>" for Linux.
+    # "C:\Users\<username>\Downloads\HubPeeker\<asset_name>" for Windows.
+    file_path = os.path.join(full_path, filename)
+    
+    response = requests.get(asset_download_url, stream=True)
+    # Get the total file size
+    file_size = int(response.headers.get('Content-Length', 0))
+
+    # Start the timer to calculate ETA and stuff..
+    start_time = time.time()
+
+    # Download the file with progress bar
+    progress = 0
+    with open(file_path, 'wb') as fd:
+        for chunk in response.iter_content(chunk_size=1024):
+            fd.write(chunk)
+            progress += len(chunk)
+            # Calculate the elapsed time and the estimated time remaining
+            elapsed_time = time.time() - start_time
+            eta = (file_size - progress) / progress * elapsed_time
+            # Print out the progress bar with ETA
+            print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
+                size_of_fmt.format_file_size(progress),
+                size_of_fmt.format_file_size(file_size),
+                '='*int(progress*50/file_size),
+                int(progress*100/file_size),
+                eta
+            ), end='')
+
+        print()
+        # Calculate the total time taken for the download
+        total_time = time.time() - start_time
+        print("Download finished in %ds ✔" % total_time)
+
+
+# def check_updates():
+
+#     if path.exists():
+#         print("`assets.json` exists, checking for updates will be helpful.")
+#         with open(f'{path}', 'r') as openfile:
+#             assets = json.load(openfile)
+
+#         print(assets.get(f'{username}').get(f'{repo}').get('version'))
+#     else:
+#         print("couldn't find `assets.json`, let's download something first to make history.")
 
 
 #########################################################
