@@ -139,7 +139,7 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
         print()
         # Calculate the total time taken for the download
         total_time = time.time() - start_time
-        print("Download finished in %ds ✔" % total_time)
+        print("Download finished in %ds" % total_time)
 
 
 # def check_updates():
@@ -172,8 +172,8 @@ Additional Information:
     formatter_class=RawTextHelpFormatter
 )
 parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
-parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.", required=True)
-parser.add_argument("-r", "--repo", help="GitHub repository name (to download assets from)", required=True)
+parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.")
+parser.add_argument("-r", "--repo", help="GitHub repository name (to download assets from)")
 parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
 parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true")
 
@@ -192,3 +192,6 @@ if username and repo != None:
     print(f"Checking release assets for `https://github.com/{username}/{repo}`")
 
     list_releases(username, repo)
+
+else:
+    print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
