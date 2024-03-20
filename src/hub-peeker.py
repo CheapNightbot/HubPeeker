@@ -3,9 +3,8 @@ import os
 import time
 from pathlib import Path
 
-from utils import github_api, json, requests, size_of_fmt
+from utils import __version__, github_api, requests, size_of_fmt
 
-assets_data = Path("./src/assets.json")
 
 def list_releases(username: str, repo: str):
     """Print assets from the list returned by `github_api.fetch_assets()` function.
@@ -154,9 +153,14 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
 
 #########################################################
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-u", "--username")
-parser.add_argument("-r", "--repo")
+parser = argparse.ArgumentParser(
+    prog="hub-peeker", 
+    description="Download Assets from GitHub Releases", 
+    epilog="Example: `hub-peeker -u 'getzola' -r 'zola'\nLicense: MIT License"
+)
+parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
+parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.")
+parser.add_argument("-r", "--repo", help="GitHub repository name")
 parser.add_argument("-U", "--update", action="store_true")
 parser.add_argument("-i", "--interactive", action="store_true")
 
