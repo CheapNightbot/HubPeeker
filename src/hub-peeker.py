@@ -2,7 +2,6 @@ import argparse
 import os
 import time
 from pathlib import Path
-from argparse import RawTextHelpFormatter
 
 from utils import __version__, github_api, requests, size_of_fmt
 
@@ -172,7 +171,7 @@ Additional Information:
   License: MIT License
   Copyright (c) 2024 Cheap Nightbot
     """,
-    formatter_class=RawTextHelpFormatter
+    formatter_class=argparse.RawTextHelpFormatter
 )
 parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
 parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.")
