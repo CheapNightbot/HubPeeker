@@ -171,7 +171,7 @@ Additional Information:
   License: MIT License
   Copyright (c) 2024 Cheap Nightbot
     """,
-    formatter_class=argparse.RawTextHelpFormatter
+    formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
 parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.")
