@@ -178,7 +178,7 @@ parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__
 parser.add_argument("-u", "--username", metavar="<USERNAME>", help="GitHub Username the repository belongs to.")
 parser.add_argument("-r", "--repo", metavar="<REPO>", help="GitHub repository name (to download assets from)")
 parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
-parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true")
+parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true", default=True)
 parser._optionals.title = "Options"
 
 args = parser.parse_args()
