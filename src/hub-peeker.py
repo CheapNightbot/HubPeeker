@@ -96,7 +96,9 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
     # and download to user's "Download" directory.
     if user_os == 'windows':
         download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+        progress_bar = '='
     elif user_os == 'linux':
+        progress_bar = '#'
         download_dir = os.path.expanduser('~/Downloads')
 
     # Create a subdirectory inside user's "Download" directory.
@@ -129,7 +131,7 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
             print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
                 size_of_fmt.format_file_size(progress),
                 size_of_fmt.format_file_size(file_size),
-                '='*int(progress*50/file_size),
+                f'{progress_bar}'*int(progress*50/file_size),
                 int(progress*100/file_size),
                 eta
             ), end='')
