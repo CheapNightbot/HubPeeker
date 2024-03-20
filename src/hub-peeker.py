@@ -175,8 +175,8 @@ Additional Information:
     formatter_class=argparse.RawDescriptionHelpFormatter
 )
 parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
-parser.add_argument("-u, --username", metavar="<USERNAME>", dest="username", help="GitHub Username the repository belongs to.")
-parser.add_argument("-r, --repo", metavar="<REPO>", dest="repo", help="GitHub repository name (to download assets from)")
+parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.")
+parser.add_argument("-r", "--repo", help="GitHub repository name (to download assets from)")
 parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
 parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true")
 parser._optionals.title = "Options"
