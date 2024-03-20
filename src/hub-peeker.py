@@ -140,6 +140,8 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
         # Calculate the total time taken for the download
         total_time = time.time() - start_time
         print("Download finished in %ds" % total_time)
+    
+    return "success"
 
 
 # def check_updates():
@@ -177,22 +179,27 @@ parser.add_argument("-u", "--username", help="GitHub Username the repository bel
 parser.add_argument("-r", "--repo", help="GitHub repository name (to download assets from)")
 parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
 parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true")
-
 parser._optionals.title = "Options"
 
 args = parser.parse_args()
 
-username = args.username
-repo = args.repo
+#########################################################
 
-if args.interactive:
-    username = input("GitHub Username: ")
-    repo = input("GitHub Repository Name: ")
+def main():
+    username = args.username
+    repo = args.repo
 
-if username and repo != None:
-    print(f"Checking release assets for `https://github.com/{username}/{repo}`")
+    if args.interactive:
+        username = input("GitHub Username: ")
+        repo = input("GitHub Repository Name: ")
 
-    list_releases(username, repo)
+    if username and repo != None:
+        print(f"Checking release assets for `https://github.com/{username}/{repo}`")
 
-else:
-    print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
+        list_releases(username, repo)
+
+    else:
+        print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
+
+if __name__ == '__main__':
+    main()
