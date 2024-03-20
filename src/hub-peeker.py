@@ -2,6 +2,7 @@ import argparse
 import os
 import time
 from pathlib import Path
+from argparse import RawTextHelpFormatter
 
 from utils import __version__, github_api, requests, size_of_fmt
 
@@ -156,13 +157,25 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
 parser = argparse.ArgumentParser(
     prog="hub-peeker", 
     description="Download Assets from GitHub Releases", 
-    epilog="Example: `hub-peeker -u 'getzola' -r 'zola'\nLicense: MIT License"
+    epilog=f"""
+Usage examples:
+  - hub-peeker -u 'username' -r 'repo'
+  - hub-peeker -i
+
+Additional Information:
+  Version: {__version__}
+  License: MIT License
+  Copyright (c) 2024 Cheap Nightbot
+    """,
+    formatter_class=RawTextHelpFormatter
 )
 parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
-parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.")
-parser.add_argument("-r", "--repo", help="GitHub repository name")
-parser.add_argument("-U", "--update", action="store_true")
-parser.add_argument("-i", "--interactive", action="store_true")
+parser.add_argument("-u", "--username", help="GitHub Username the repository belongs to.", required=True)
+parser.add_argument("-r", "--repo", help="GitHub repository name (to download assets from)", required=True)
+parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
+parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true")
+
+parser._optionals.title = "Options"
 
 args = parser.parse_args()
 
@@ -177,6 +190,3 @@ if username and repo != None:
     print(f"Checking release assets for `https://github.com/{username}/{repo}`")
 
     list_releases(username, repo)
-
-else:
-    print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
