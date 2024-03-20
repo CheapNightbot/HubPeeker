@@ -199,7 +199,7 @@ def main():
         list_releases(username, repo)
 
     else:
-        print("Please provide with the <username> and <repo>!\nRun `hub-peeker -h` for usage information.")
+        print("Please provide with the <USERNAME> and <REPO>!\nRun `hub-peeker -h` for usage information.")
 
 if __name__ == '__main__':
     main()
