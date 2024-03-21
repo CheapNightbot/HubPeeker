@@ -3,7 +3,7 @@ import os
 import time
 # from pathlib import Path
 
-from utils import __version__, github_api, requests, size_of_fmt
+from utils import __version__, github_api, pretty_bytes, requests
 
 
 def list_releases(username: str, repo: str):
@@ -24,11 +24,11 @@ def list_releases(username: str, repo: str):
             recommend = ""
             if asset.get('recommend'):
                 recommend = "\033[92m[RECOMMENDED]\033[0m"
-            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({size_of_fmt.format_file_size(asset.get('asset_size'))}) {recommend}")
+            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({pretty_bytes.format_file_size(asset.get('asset_size'))}) {recommend}")
 
         while True:
             try:
-                select_asset = int(input(f"\nPlease select a release to downloaded (1-{asset_len}): "))
+                select_asset = int(input(f"\nPlease select an asset to download (1-{asset_len}): "))
                 
                 match select_asset:
                     case 0:
@@ -85,13 +85,13 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
 
     # Create a subdirectory inside user's "Download" directory.
     subdirectory = "HubPeeker"
-    full_path = os.path.join(download_dir, subdirectory)
-    os.makedirs(full_path, exist_ok=True)
+    download_path = os.path.join(download_dir, subdirectory)
+    os.makedirs(download_path, exist_ok=True)
     
     # This is the path where the asset will be saved / downloaded.
     # "~/Downloads/HubPeeker/<asset_name>" OR "/home/<username>/Downloads/HubPeeker/<asset_name>" for Linux.
     # "C:\Users\<username>\Downloads\HubPeeker\<asset_name>" for Windows.
-    file_path = os.path.join(full_path, filename)
+    file_path = os.path.join(download_path, filename)
     
     response = requests.get(asset_download_url, stream=True)
     # Get the total file size
@@ -112,8 +112,8 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
                 eta = (file_size - progress) / progress * elapsed_time
                 # Print out the progress bar with ETA
                 print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
-                    size_of_fmt.format_file_size(progress),
-                    size_of_fmt.format_file_size(file_size),
+                    pretty_bytes.format_file_size(progress),
+                    pretty_bytes.format_file_size(file_size),
                     f'{progress_bar}'*int(progress*50/file_size),
                     int(progress*100/file_size),
                     eta
@@ -123,7 +123,7 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
             # Calculate the total time taken for the download
             total_time = time.time() - start_time
             print("Download finished in %ds" % total_time)
-        
+        print(f"Downloaded asset can be found here: '{download_path}'")
         return "success"
     except KeyboardInterrupt:
         print("\nDownload has been cancelled!\nNOTE: This application does not support the resumption of downloads. If you initiate a download again (even for the same asset), it will start from the beginning and overwrite any previously downloaded content.")
@@ -153,7 +153,7 @@ parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__
 parser.add_argument("-u", "--username", metavar="<USERNAME>", help="GitHub Username the repository belongs to.")
 parser.add_argument("-r", "--repo", metavar="<REPO>", help="GitHub repository name (to download assets from)")
 parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
-parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets.", action="store_true", default=True)
+parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets. [WIP]", action="store_true", default=True)
 parser._optionals.title = "Options"
 
 args = parser.parse_args()
