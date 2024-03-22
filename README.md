@@ -5,7 +5,7 @@
 [![Version](https://img.shields.io/badge/version-0.6.9_(alpha)-blue)](#)
 [![Python](https://badgen.net/pypi/python/black)](#)
 
-[![License](https://forthebadge.com/images/badges/license-mit.svg)](#) 
+[![License](https://forthebadge.com/images/badges/license-mit.svg)](LICENSE) 
 [![Spaghetti Code](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](#) 
 [![Kinda SFW](https://forthebadge.com/images/badges/kinda-sfw.svg)](#) 
 
