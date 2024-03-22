@@ -3,8 +3,8 @@ import os
 import time
 # from pathlib import Path
 
-from utils import __version__, github_api, pretty_bytes, requests
-
+from utils import __version__, github_api, requests
+from utils.pretty_bytes import pretty_bytes
 
 def list_releases(username: str, repo: str):
     """Print assets from the list returned by `github_api.fetch_assets()` function.
@@ -24,7 +24,7 @@ def list_releases(username: str, repo: str):
             recommend = ""
             if asset.get('recommend'):
                 recommend = "\033[92m[RECOMMENDED]\033[0m"
-            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({pretty_bytes.format_file_size(asset.get('asset_size'))}) {recommend}")
+            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({pretty_bytes(asset.get('asset_size'))}) {recommend}")
 
         while True:
             try:
@@ -112,8 +112,8 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
                 eta = (file_size - progress) / progress * elapsed_time
                 # Print out the progress bar with ETA
                 print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
-                    pretty_bytes.format_file_size(progress),
-                    pretty_bytes.format_file_size(file_size),
+                    pretty_bytes(progress),
+                    pretty_bytes(file_size),
                     f'{progress_bar}'*int(progress*50/file_size),
                     int(progress*100/file_size),
                     eta

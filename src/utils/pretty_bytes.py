@@ -8,7 +8,7 @@ This one have good and short explanation: https://wiki.ubuntu.com/UnitsPolicy
 Also read this: https://web.archive.org/web/20150324153922/https://pacoup.com/2009/05/26/kb-kb-kib-whats-up-with-that/
 """
 
-def format_file_size(num: int, suffix='B'):
+def pretty_bytes(num: int, suffix='B') -> str:
     """This function takes a number of bytes and returns a string with the size in the most appropriate unit (bytes, kibibytes, mebibytes, etc.). For example, `format_file_size(9697289)` would return `'9.25 MiB'`.
 
     Args:
