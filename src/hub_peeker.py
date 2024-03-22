@@ -1,10 +1,12 @@
 import argparse
 import os
 import time
-# from pathlib import Path
 
 from utils import __version__, github_api, requests
 from utils.pretty_bytes import pretty_bytes
+
+# from pathlib import Path
+
 
 def list_releases(username: str, repo: str):
     """Print assets from the list returned by `github_api.fetch_assets()` function.
