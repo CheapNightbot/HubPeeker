@@ -22,10 +22,11 @@
 # Table of Content
 
 * [FEATURES](#features)
-  * [PLANNED / IN PROGRESS](#planned--in-progress)
+  * [Planned / In Progress](#planned--in-progress)
+  * [Testing](#testing)
 * [INSTALLATION](#installation)
-  * [REQUIREMENTS](#requirements)
-  * [FOR NOW](#for-now)
+  * [Binaries](#binaries)
+  * [Cloning and Running the Application](#cloning-and-running-the-application)
 * [USAGE AND OPTIONS](#usage-and-options)
   * [Quick Overview](#quick-overview)
   * [Explanation of each Option](#explanation-of-each-option)
@@ -37,6 +38,7 @@
 # FEATURES
 
 > ⚠ __WORK IN PROGRESS! LACKS SOME FEATURES__.
+> This project is currently in the early stages of development.
 > > - It does not currently have ability to resume download.
 > > - There is no way to track the version of downloaded asset and check if there is new release availabe on GitHub. (Though, I had created `.json` file for it, but it was getting all over the place, so removed).
 > > - It downloads the asset to "HubPeeker" sub-directory inside user's "Download" directory by default and there is no way for user to specify it.
@@ -50,27 +52,34 @@
 - Show the asset size (in human-readable format using `base-2`).
 - User can select an asset and it will download the selected asset inside "HubPeeker" sub-directory to the user's "Download" directory.
 
-## PLANNED / IN PROGRESS
+## Planned / In Progress
 - [ ] Use local database (most likely **SQLite**) to track the downloaded version of each asset and compare downloaded version with the latest version on GitHub. (Likely to automate the download if there is new release).
 - [ ] Have ability to pause and resume the download of asset(s).
 - [ ] Users can specify the download directory.
 - [ ] The end goal of this project is to automate the download of the asset(s) from the GitHub Releases once the user has downloaded an asset and there is new version/release for that asset is available.
 - [ ] Properly setup and maintain this repository !!
 
+## Testing
+
+As the project is still evolving, comprehensive tests have not been written yet. This is something I acknowledge and plan to address as the project becomes more stable.
+
 # INSTALLATION
 
-## REQUIREMENTS
+## Binaries
 
-- Python 3.8 or higher.
-- Internet Connection (of course).
+I plan to provide binaries for different operating systems in the future. However, as the project is still in the early stages, these are not available yet. I will update this section as soon as they are ready.
 
-## FOR NOW:
+Thank you for your understanding!
+
+## Cloning and Running the Application
+
+Make sure you have **Python 3.8** or higher installed on your system.
 
 - Clone the repository.
 - [Create virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) and activate it. [Optional]
-- Run `python -m pip install -r requirements.txt` or just install `requests`. Yes, the only third-party package required is `requests`.
+- Run `python -m pip install -r requirements.txt`.
 - Change directory into `src` by `cd src`.
-- Run `python hub-peeker.py -h`.
+- Run `python hub_peeker.py -h`.
 
 # USAGE AND OPTIONS
 
