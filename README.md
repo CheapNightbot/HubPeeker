@@ -47,6 +47,13 @@
   <img src="docs/images/HubPeeker - FlowChart.png" />
 </h1>
 
+<details>
+  <summary>DEMO</summary>
+  <p align="center">
+    <img src="docs/images/HubPeeker - DEMO.gif" />
+  </p>
+</details>
+
 - List all the available assets from the latest release of the given GitHub Repository.
 - Detect and suggest an asset based on the user's operating system and CPU architecture.
 - Show the asset size (in human-readable format using `base-2`).
