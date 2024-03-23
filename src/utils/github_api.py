@@ -21,7 +21,7 @@ def validate_username_repo(username:str, repo:str):
 
     try:
         response = requests.get(url, headers)
-    except ConnectionError:
+    except requests.exceptions.ConnectionError:
         return  {f'{response_key}': "Connection Error! Make sure you are connected to the internet and try again. X﹏X"}
     
     if response.status_code != requests.codes.ok:
@@ -59,7 +59,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     
     try:
         response = requests.get(url, headers)
-    except ConnectionError:
+    except requests.exceptions.ConnectionError:
         return  {f'{response_key}': "Connection Error! Make sure you are connected to the internet and try again. X﹏X"}
     
     if response.status_code != requests.codes.ok:
