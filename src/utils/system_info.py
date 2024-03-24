@@ -25,7 +25,20 @@ def get_system_info():
             if "64" in arch:
                 info['architecture'].append("x86_64")
                 break
+        
+        if 'linux' in info['platform']:
+            info['ids'] = get_like_distro()
 
         return json.dumps(info)
     except Exception as e:
         logging.exception(e)
+
+
+def get_like_distro():
+
+    info = platform.freedesktop_os_release()
+    ids = [info["ID"]]
+    if "ID_LIKE" in info:
+        # ids are space separated and ordered by precedence
+        ids.extend(info["ID_LIKE"].split())
+    return ids
