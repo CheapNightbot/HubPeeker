@@ -31,7 +31,6 @@ parser._optionals.title = "Options"
 
 args = parser.parse_args()
 
-#########################################################
 
 def main():
 
