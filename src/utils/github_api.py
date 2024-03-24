@@ -84,6 +84,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     user_system_info = json.loads(system_info.get_system_info())
     user_os = user_system_info.get("platform")
     user_arch = user_system_info.get("architecture")
+    os_ids = user_system_info.get("ids")
 
     assets = []
     asset_number = 1
@@ -112,13 +113,6 @@ def fetch_assets(username: str, repo: str) -> list | dict:
                 if arch in x.get("name").lower():
                     asset['user_arch'] = arch
                     recommend = True
-                    # maybe there are 3 architecture in `user_arch` (i.e.: 'amd64', 'x64', etc.).
-                    # so, if it matches with the first or maybe second one, don't check for further
-                    # and break out of this `for` loop. otherwise, if it only matches with first one
-                    # in the list, it will set `recommend` to `True` (in the first iteration) and
-                    # then for the rest it will just set it to `False` and will be return with
-                    # `recommend = False` even if it was supposed to be `True`. 
-                    # Sorry, for bad Inglish. <( _ _ )>
                     break
         
         asset['recommend'] = recommend
