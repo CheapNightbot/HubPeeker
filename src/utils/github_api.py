@@ -1,4 +1,7 @@
-from . import json, requests, system_info
+import os
+import time
+
+from . import json, requests, system_info, pretty_bytes
 
 # Create variables for `headers` and "Bad response"
 # 'cause these were being repeated several times through out
@@ -6,6 +9,8 @@ from . import json, requests, system_info
 headers = {'accept': 'application/vnd.github+json'}
 response_key = "Bad response"
 
+
+# Step 1 ~ Check if the given Username & Repo exist on GitHub
 def validate_username_repo(username:str, repo:str):
     """Check if the given Username (user) and Repository exist on GitHub
 
@@ -39,6 +44,7 @@ def validate_username_repo(username:str, repo:str):
             return requests.codes.ok
 
 
+# Step 2 ~ Fetch the assets from the latest release
 def fetch_assets(username: str, repo: str) -> list | dict:
     """Fetch the list of assets of latest release for a given GitHub repository.
 
@@ -52,6 +58,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     """
 
     check_user_repo = validate_username_repo(username, repo)
+
     if check_user_repo != 200:
         return check_user_repo
 
@@ -119,3 +126,130 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         asset_number += 1
 
     return assets
+
+
+# Step 3 ~ List all the available assets
+def list_assets(username: str, repo: str):
+    """Print assets from the list returned by `fetch_assets()` function.
+    Prompt user to select an asset and print download URL of selected asset.
+
+    Args:
+        - `username` (str): GitHub Username
+        - `repo` (str): GitHub Repository name
+    """
+
+    assets = fetch_assets(username, repo)
+    
+    try:
+        asset_len = len(assets)
+
+        for asset in assets:
+            recommend = ""
+            if asset.get('recommend'):
+                recommend = "\033[92m[RECOMMENDED]\033[0m"
+            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({pretty_bytes.pretty_bytes(asset.get('asset_size'))}) {recommend}")
+
+        while True:
+            try:
+                select_asset = int(input(f"\nPlease select an asset to download (1-{asset_len}): "))
+                
+                match select_asset:
+                    case 0:
+                        print("You are not a computer, count from 1 ~! (ｏ ‵-′)ノ”(ノ﹏<。)")
+                        continue
+
+                if select_asset > asset_len:
+                    print(f"There are only {asset_len} assets and you selected {select_asset}, why (´･ω･`)?")
+                    continue
+                
+                asset_number = select_asset - 1
+
+                download_url = assets[asset_number].get('asset_download_url')
+                asset_filename = assets[asset_number].get('asset_name')
+                user_os = assets[asset_number].get('user_os')
+                download_asset(download_url, asset_filename, user_os)
+                return
+            except KeyboardInterrupt:
+                print("\n")
+                exit(1)
+
+    except Exception:
+        response_code = assets.get('Response code')
+        if response_code != 200 and response_code != None:
+            match response_code:
+                case 404:
+                    print("Resource not found.")
+            print("Looks like this repository does not have any releases or assets. (￣_￣|||)")
+            return
+        elif assets.get('Bad response'):
+            response_msg = assets.get('Bad response')
+        print(response_msg)
+        return
+
+
+# Step 4 ~ Download the user selected asset
+def download_asset(asset_download_url: str, filename: str, user_os: str):
+    """Download Asset into user's `Download` directory, inside `HubPeeker` sub-directory.
+
+    Args:
+        - `asset_download_url` (str): Asset download URL.
+        - `filename` (str): Asset will be saved with this name.
+        - `user_os` (str): User's Operating System (i.e.: Windows or Linux).
+
+    Returns:
+        - `str`: Return string literal 'success' after successfully downloading asset or 'failed' if user interrupts it.
+    """
+    # Check whether user in on "Windows" OR "Linux"
+    # and download to user's "Download" directory.
+    if user_os == 'windows':
+        download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+        progress_bar = '='
+    elif user_os == 'linux':
+        progress_bar = '#'
+        download_dir = os.path.expanduser('~/Downloads')
+
+    # Create a subdirectory inside user's "Download" directory.
+    subdirectory = "HubPeeker"
+    download_path = os.path.join(download_dir, subdirectory)
+    os.makedirs(download_path, exist_ok=True)
+    
+    # This is the path where the asset will be saved / downloaded.
+    # "~/Downloads/HubPeeker/<asset_name>" OR "/home/<username>/Downloads/HubPeeker/<asset_name>" for Linux.
+    # "C:\Users\<username>\Downloads\HubPeeker\<asset_name>" for Windows.
+    file_path = os.path.join(download_path, filename)
+    
+    response = requests.get(asset_download_url, stream=True)
+    # Get the total file size
+    file_size = int(response.headers.get('Content-Length', 0))
+
+    # Start the timer to calculate ETA and stuff..
+    start_time = time.time()
+
+    try:
+        # Download the file with progress bar
+        progress = 0
+        with open(file_path, 'wb') as fd:
+            for chunk in response.iter_content(chunk_size=1024):
+                fd.write(chunk)
+                progress += len(chunk)
+                # Calculate the elapsed time and the estimated time remaining
+                elapsed_time = time.time() - start_time
+                eta = (file_size - progress) / progress * elapsed_time
+                # Print out the progress bar with ETA
+                print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
+                    pretty_bytes.pretty_bytes(progress),
+                    pretty_bytes.pretty_bytes(file_size),
+                    f'{progress_bar}'*int(progress*50/file_size),
+                    int(progress*100/file_size),
+                    eta
+                ), end='')
+
+            print()
+            # Calculate the total time taken for the download
+            total_time = time.time() - start_time
+            print("Download finished in %ds" % total_time)
+        print(f"Downloaded asset can be found here: '{download_path}'")
+        return "success"
+    except KeyboardInterrupt:
+        print("\nDownload has been cancelled!\nNOTE: This application does not support the resumption of downloads. If you initiate a download again (even for the same asset), it will start from the beginning and overwrite any previously downloaded content.")
+        return "failed"
