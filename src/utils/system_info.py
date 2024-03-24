@@ -23,7 +23,10 @@ def get_system_info():
         """
         for arch in info.get('architecture'):
             if "64" in arch:
-                info['architecture'].append("x86_64")
+                if arch != "x86_64":
+                    info['architecture'].append("x86_64")
+                else:
+                    info['architecture'].append("amd64")
                 break
         
         if 'linux' in info['platform']:
