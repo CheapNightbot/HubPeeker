@@ -89,33 +89,22 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     assets = []
     asset_number = 1
 
+    tag_name = response_json.get('tag_name').lower()
     for x in response_json.get("assets"):
-        asset = {}
-        asset['username'] = username
-        asset['repo'] = repo
-        asset['release_version'] = response_json.get('tag_name')
-        asset['asset_number'] = asset_number
-        asset['asset_name'] = x.get("name")
-        asset['asset_download_url'] = x.get("browser_download_url")
-        asset['asset_size'] = x.get("size")
-        asset['asset_type'] = x.get("content_type")
-        asset['user_os'] = user_os
-        
-        """
-        If `user_os` (returned by `system_info.get_system_info()` function) string literal (e.g.: 'windows', 'linux')
-        is in the release name string literal, then check if it (release name) also mentions one of the 
-        CPU achitectures (returned by `system_info.get_system_info() as a list) and if it does (e.g.: 'app-release-v1.0-x86_64-windows.zip'),
-        then add 'recommend' key with value `True` into `asset` dictionary. 
-        """
-        recommend = False
-        if user_os in x.get("name").lower():
-            for arch in user_arch:
-                if arch in x.get("name").lower():
-                    asset['user_arch'] = arch
-                    recommend = True
-                    break
-        
-        asset['recommend'] = recommend
+        name = x.get("name").lower()
+        asset = {
+            'username': username,
+            'repo': repo,
+            'release_version': tag_name,
+            'asset_number': asset_number,
+            'asset_name': name,
+            'asset_download_url': x.get("browser_download_url"),
+            'asset_size': x.get("size"),
+            'asset_type': x.get("content_type"),
+            'user_os': user_os,
+            'user_arch': next((arch for arch in user_arch if arch in name), None),
+            'recommend': user_os in name and 'user_arch' in asset
+        }
         assets.append(asset)
         asset_number += 1
 
