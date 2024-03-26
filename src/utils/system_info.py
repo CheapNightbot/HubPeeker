@@ -1,4 +1,3 @@
-import logging
 import platform
 
 from . import json
@@ -30,5 +29,5 @@ def get_system_info():
                 break
 
         return json.dumps(info)
-    except Exception as e:
-        logging.exception(e)
+    except Exception:
+        return {'error': 'Something went wrong while getting system information. I have no idea right now.. (⊙_⊙;)'}

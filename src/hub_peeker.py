@@ -2,8 +2,6 @@ import argparse
 
 from utils import __version__, github_api
 
-# from pathlib import Path
-
 
 parser = argparse.ArgumentParser(
     prog="hub-peeker",
@@ -31,18 +29,18 @@ parser._optionals.title = "Options"
 
 args = parser.parse_args()
 
+username = args.username
+repo = args.repo
 
-def main():
 
-    username = args.username
-    repo = args.repo
+def main(username: str, repo: str):
 
     if args.interactive:
         username = input("GitHub Username: ")
         repo = input("GitHub Repository Name: ")
 
-    if username and repo != None:
-        print(f"Checking release assets for `https://github.com/{username}/{repo}`")
+    if username and repo:
+        print(f"Checking release assets for `https://github.com/{username}/{repo}`\n")
 
         github_api.list_assets(username, repo)
 
@@ -51,4 +49,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(username, repo)
