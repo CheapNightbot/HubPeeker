@@ -84,7 +84,6 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     user_system_info = json.loads(system_info.get_system_info())
     user_os = user_system_info.get("platform")
     user_arch = user_system_info.get("architecture")
-    os_ids = user_system_info.get("ids")
 
     assets = []
     asset_number = 1
