@@ -92,6 +92,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     tag_name = response_json.get('tag_name').lower()
     for x in response_json.get("assets"):
         name = x.get("name").lower()
+        arch = next((arch for arch in user_arch if arch in name), None)
         asset = {
             'username': username,
             'repo': repo,
@@ -102,8 +103,8 @@ def fetch_assets(username: str, repo: str) -> list | dict:
             'asset_size': x.get("size"),
             'asset_type': x.get("content_type"),
             'user_os': user_os,
-            'user_arch': next((arch for arch in user_arch if arch in name), None),
-            'recommend': user_os in name and 'user_arch' in asset
+            'user_arch': arch,
+            'recommend': user_os in name and arch
         }
         assets.append(asset)
         asset_number += 1
