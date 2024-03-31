@@ -55,7 +55,9 @@ def main(username: str, repo: str):
 
     except KeyboardInterrupt:
         # `CTRL + C` is your friend ;)
+        print()
         pass
+
 
 if __name__ == '__main__':
     main(username, repo)
