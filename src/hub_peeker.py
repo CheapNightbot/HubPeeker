@@ -35,22 +35,27 @@ repo = args.repo
 
 def main(username: str, repo: str):
 
-    if args.interactive:
-        username = input("GitHub Username: ")
-        while not username.isalnum():
+    try:
+
+        if args.interactive:
             username = input("GitHub Username: ")
-        repo = input("GitHub Repository Name: ")
-        while not repo.isalnum():
+            while not username.isalnum():
+                username = input("GitHub Username: ")
             repo = input("GitHub Repository Name: ")
+            while not repo.isalnum():
+                repo = input("GitHub Repository Name: ")
 
-    if username and repo and username.isalnum() and repo.isalnum():
-        print(f"Checking release assets for `https://github.com/{username}/{repo}`\n")
+        if username and repo and username.isalnum() and repo.isalnum():
+            print(f"Checking release assets for `https://github.com/{username}/{repo}`\n")
 
-        github_api.list_assets(username, repo)
+            github_api.list_assets(username, repo)
 
-    else:
-        parser.exit(status=1, message="Please provide with the <USERNAME> and <REPO>!\nRun `hub-peeker -h` for usage information.\n")
+        else:
+            parser.exit(status=1, message="Please provide with the <USERNAME> and <REPO>!\nRun `hub-peeker -h` for usage information.\n")
 
+    except KeyboardInterrupt:
+        # `CTRL + C` is your friend ;)
+        pass
 
 if __name__ == '__main__':
     main(username, repo)
