@@ -37,9 +37,13 @@ def main(username: str, repo: str):
 
     if args.interactive:
         username = input("GitHub Username: ")
+        while not username.isalnum():
+            username = input("GitHub Username: ")
         repo = input("GitHub Repository Name: ")
+        while not repo.isalnum():
+            repo = input("GitHub Repository Name: ")
 
-    if username and repo:
+    if username and repo and username.isalnum() and repo.isalnum():
         print(f"Checking release assets for `https://github.com/{username}/{repo}`\n")
 
         github_api.list_assets(username, repo)
