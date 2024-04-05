@@ -29,11 +29,11 @@ parser._optionals.title = "Options"
 
 args = parser.parse_args()
 
-username = args.username
-repo = args.repo
 
+def main():
 
-def main(username: str, repo: str):
+    username = args.username
+    repo = args.repo
 
     try:
 
@@ -55,9 +55,8 @@ def main(username: str, repo: str):
 
     except KeyboardInterrupt:
         # `CTRL + C` is your friend ;)
-        print()
-        pass
+        exit(code=1)
 
 
 if __name__ == '__main__':
-    main(username, repo)
+    main()
