@@ -127,10 +127,11 @@ def list_assets(username: str, repo: str):
     try:
         asset_len = len(assets)
 
-        if asset_len <= 1 and assets.get('Response code') or assets.get('Bad response'):
-            raise Exception
+        if asset_len <= 1:
+            if assets.get('Response code') or assets.get('Bad response'):
+                raise Exception
 
-        print(f"{"INDEX":<10} {"ASSET NAME":50} ASSET SIZE")
+        print(f"{"NO.":<4} {"ASSET NAME":50} ASSET SIZE")
 
         for asset in assets:
             num = asset.get('asset_number')
@@ -139,7 +140,7 @@ def list_assets(username: str, repo: str):
             recommend = ""
             if asset.get('recommend'):
                 recommend = "\033[92m[RECOMMENDED]\033[0m"
-            print(f"{num:10} {name:50} {size} {recommend}")
+            print(f"{num:<4} {name:50} {size} {recommend}")
 
         while True:
             try:
