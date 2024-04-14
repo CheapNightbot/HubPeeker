@@ -83,7 +83,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     
     user_system_info = json.loads(system_info.get_system_info())
     user_os = user_system_info.get("platform")
-    user_arch = user_system_info.get("architecture")
+    user_arch = sorted(user_system_info.get("architecture"))
 
     assets = []
     asset_number = 1
@@ -91,7 +91,8 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     tag_name = response_json.get('tag_name').lower()
     for x in response_json.get("assets"):
         name = x.get("name").lower()
-        arch = next((arch for arch in user_arch if arch in name), None)
+        arch = next((arch for arch in user_arch if arch in name), 'None')
+
         asset = {
             'username': username,
             'repo': repo,
@@ -103,7 +104,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
             'asset_type': x.get("content_type"),
             'user_os': user_os,
             'user_arch': arch,
-            'recommend': user_os in name and arch
+            'recommend': True if user_os in name and arch in name else False
         }
         assets.append(asset)
         asset_number += 1
@@ -126,11 +127,19 @@ def list_assets(username: str, repo: str):
     try:
         asset_len = len(assets)
 
+        if asset_len <= 1 and assets.get('Response code') or assets.get('Bad response'):
+            raise Exception
+
+        print(f"{"INDEX":<10} {"ASSET NAME":50} ASSET SIZE")
+
         for asset in assets:
+            num = asset.get('asset_number')
+            name = asset.get('asset_name')
+            size = pretty_bytes.pretty_bytes(asset.get('asset_size'))
             recommend = ""
             if asset.get('recommend'):
                 recommend = "\033[92m[RECOMMENDED]\033[0m"
-            print(f"{asset.get('asset_number')}. {asset.get('asset_name')} - ({pretty_bytes.pretty_bytes(asset.get('asset_size'))}) {recommend}")
+            print(f"{num:10} {name:50} {size} {recommend}")
 
         while True:
             try:

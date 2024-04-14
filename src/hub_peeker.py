@@ -18,13 +18,36 @@ Additional Information:
   License: MIT License
   Copyright (c) 2024 Cheap Nightbot
     """,
-    formatter_class=argparse.RawDescriptionHelpFormatter
+    formatter_class=argparse.RawDescriptionHelpFormatter,
 )
-parser.add_argument("-v", "--version", action='version', version=f'%(prog)s v{__version__}')
-parser.add_argument("-u", "--username", metavar="<USERNAME>", help="GitHub Username the repository belongs to.")
-parser.add_argument("-r", "--repo", metavar="<REPO>", help="GitHub repository name (to download assets from)")
-parser.add_argument("-i", "--interactive", help="Enter interactive mode to input GitHub username and repository interactively.", action="store_true")
-parser.add_argument("-U", "--update", help="Check for new version/release of already downloaded assets. [WIP]", action="store_true", default=True)
+parser.add_argument(
+    "-v", "--version", action="version", version=f"%(prog)s v{__version__}"
+)
+parser.add_argument(
+    "-u",
+    "--username",
+    metavar="<USERNAME>",
+    help="GitHub Username the repository belongs to.",
+)
+parser.add_argument(
+    "-r",
+    "--repo",
+    metavar="<REPO>",
+    help="GitHub repository name (to download assets from)",
+)
+parser.add_argument(
+    "-i",
+    "--interactive",
+    help="Enter interactive mode to input GitHub username and repository interactively.",
+    action="store_true",
+)
+parser.add_argument(
+    "-U",
+    "--update",
+    help="Check for new version/release of already downloaded assets. [WIP]",
+    action="store_true",
+    default=True,
+)
 parser._optionals.title = "Options"
 
 args = parser.parse_args()
@@ -46,17 +69,22 @@ def main():
                 repo = input("GitHub Repository Name: ")
 
         if username and repo and username.isalnum() and repo.isalnum():
-            print(f"Checking release assets for `https://github.com/{username}/{repo}`\n")
+            print(
+                f"Checking release assets for `https://github.com/{username}/{repo}`\n"
+            )
 
             github_api.list_assets(username, repo)
 
         else:
-            parser.exit(status=1, message="Please provide with the <USERNAME> and <REPO>!\nRun `hub-peeker -h` for usage information.\n")
+            parser.exit(
+                status=1,
+                message="Please provide with the <USERNAME> and <REPO>!\nRun `hub-peeker -h` for usage information.\n",
+            )
 
     except KeyboardInterrupt:
         # `CTRL + C` is your friend ;)
         exit(code=1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

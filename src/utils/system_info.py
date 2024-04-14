@@ -20,8 +20,11 @@ def get_system_info():
         'architecture' containing '64' and assume it's a '64-bit CPU' and manual 
         append 'x86_64' to 'architecture' key. ヾ(￣▽￣) Bye~Bye~
         """
-        for arch in info.get('architecture'):
+
+        architecture = [platform.machine().lower(), platform.architecture()[0].lower()]
+        for arch in architecture:
             if "64" in arch:
+                info['architecture'].append("x64")
                 if arch != "x86_64":
                     info['architecture'].append("x86_64")
                 else:
@@ -30,4 +33,5 @@ def get_system_info():
 
         return json.dumps(info)
     except Exception:
-        return {'error': 'Something went wrong while getting system information. I have no idea right now.. (⊙_⊙;)'}
+        info = {'error': 'Something went wrong while getting system information. I have no idea right now.. (⊙_⊙;)'}
+        return json.dumps(info)
