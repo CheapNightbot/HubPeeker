@@ -43,7 +43,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "-d",
-    "--directory",
+    "--dir",
     metavar="<DIRECTORY_PATH>",
     help="Specify the download directory. Default to user's 'Download' directory.",
 )
@@ -76,7 +76,7 @@ def main():
 
     username = args.username
     repo = args.repo
-    download_path = args.directory
+    download_path = args.dir
 
     try:
 
@@ -109,7 +109,7 @@ def main():
 
             download_dir = parse_config() if parse_config() else Path("~/Downloads/HubPeeker/").expanduser()
             download_path = Path(download_path).expanduser() if download_path else download_dir
-            if args.directory:
+            if args.dir:
                 save_path = input("Would you like save this path as default path for future downloads? [Y/N]: ")
                 if save_path.lower() == "y":
                     path = Path("./config.json")
