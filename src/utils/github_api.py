@@ -6,12 +6,12 @@ from . import json, requests, system_info, pretty_bytes
 # Create variables for `headers` and "Bad response"
 # 'cause these were being repeated several times through out
 # this file and "SonarLint" was annoying me with warning. ￣へ￣
-headers = {'accept': 'application/vnd.github+json'}
+headers = {"accept": "application/vnd.github+json"}
 response_key = "Bad response"
 
 
 # Step 1 ~ Check if the given Username & Repo exist on GitHub
-def validate_username_repo(username:str, repo:str):
+def validate_username_repo(username: str, repo: str):
     """Check if the given Username (user) and Repository exist on GitHub
 
     Args:
@@ -27,19 +27,27 @@ def validate_username_repo(username:str, repo:str):
     try:
         response = requests.get(url, headers)
     except requests.exceptions.ConnectionError:
-        return  {f'{response_key}': "Connection Error! Make sure you are connected to the internet and try again. X﹏X"}
-    
+        return {
+            f"{response_key}": "Connection Error! Make sure you are connected to the internet and try again. X﹏X"
+        }
+
     if response.status_code != requests.codes.ok:
         match response.status_code:
             case 403:
-                return {f'{response_key}': "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."}
-        return {f'{response_key}': f"Couldn't find this user with username `{username}` on GitHub.\nMake sure you have entered the correct spelling."}
+                return {
+                    f"{response_key}": "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."
+                }
+        return {
+            f"{response_key}": f"Couldn't find this user with username `{username}` on GitHub.\nMake sure you have entered the correct spelling."
+        }
     else:
         url = f"https://api.github.com/repos/{username}/{repo}"
         response = requests.get(url, headers)
 
         if response.status_code != requests.codes.ok:
-            return {f'{response_key}': f"Couldn't find this Repository `{repo}` under this `{username}` username.\nMake sure you have entered the correct spelling.\nAlso, please note that this CLI Application (currently) doesn't support downloading assets from Private Repositories. Thank you for your understanding!"}
+            return {
+                f"{response_key}": f"Couldn't find this Repository `{repo}` under this `{username}` username.\nMake sure you have entered the correct spelling.\nAlso, please note that this CLI Application (currently) doesn't support downloading assets from Private Repositories. Thank you for your understanding!"
+            }
         else:
             return requests.codes.ok
 
@@ -53,7 +61,7 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         - `repo` (str): GitHub Repository name
 
     Returns:
-       - `list`: Return dictionary of assets inside a list. 
+       - `list`: Return dictionary of assets inside a list.
        - `dict`: If something goes wrong, return error message as dictionary.
     """
 
@@ -63,24 +71,30 @@ def fetch_assets(username: str, repo: str) -> list | dict:
         return check_user_repo
 
     url = f"https://api.github.com/repos/{username}/{repo}/releases/latest"
-    
+
     try:
         response = requests.get(url, headers)
     except requests.exceptions.ConnectionError:
-        return  {f'{response_key}': "Connection Error! Make sure you are connected to the internet and try again. X﹏X"}
-    
+        return {
+            f"{response_key}": "Connection Error! Make sure you are connected to the internet and try again. X﹏X"
+        }
+
     if response.status_code != requests.codes.ok:
         match response.status_code:
             case 403:
-                return {f'{response_key}': "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."}
-        response_code = {'Response code': response.status_code}
+                return {
+                    f"{response_key}": "API rate limit exceeded for your IP. Maybe, try again after sometime.\nSorry for this! Currently this CLI Application only relies on direct HTTP requests to GitHub API endpoints, thus GitHub rate limits it."
+                }
+        response_code = {"Response code": response.status_code}
         return response_code
 
     response_json = json.loads(response.content)
 
     print(f"The latest release version / tag: {response_json.get('tag_name')}")
-    print(f"There are {len(response_json.get('assets'))} assets available in the latest release.\n")
-    
+    print(
+        f"There are {len(response_json.get('assets'))} assets available in the latest release.\n"
+    )
+
     user_system_info = json.loads(system_info.get_system_info())
     user_os = user_system_info.get("platform")
     user_arch = sorted(user_system_info.get("architecture"))
@@ -88,23 +102,23 @@ def fetch_assets(username: str, repo: str) -> list | dict:
     assets = []
     asset_number = 1
 
-    tag_name = response_json.get('tag_name').lower()
+    tag_name = response_json.get("tag_name").lower()
     for x in response_json.get("assets"):
         name = x.get("name").lower()
-        arch = next((arch for arch in user_arch if arch in name), 'None')
+        arch = next((arch for arch in user_arch if arch in name), "None")
 
         asset = {
-            'username': username,
-            'repo': repo,
-            'release_version': tag_name,
-            'asset_number': asset_number,
-            'asset_name': name,
-            'asset_download_url': x.get("browser_download_url"),
-            'asset_size': x.get("size"),
-            'asset_type': x.get("content_type"),
-            'user_os': user_os,
-            'user_arch': arch,
-            'recommend': True if user_os in name and arch in name else False
+            "username": username,
+            "repo": repo,
+            "release_version": tag_name,
+            "asset_number": asset_number,
+            "asset_name": name,
+            "asset_download_url": x.get("browser_download_url"),
+            "asset_size": x.get("size"),
+            "asset_type": x.get("content_type"),
+            "user_os": user_os,
+            "user_arch": arch,
+            "recommend": True if user_os in name and arch in name else False,
         }
         assets.append(asset)
         asset_number += 1
@@ -123,43 +137,52 @@ def list_assets(username: str, repo: str):
     """
 
     assets = fetch_assets(username, repo)
-    
+
     try:
         asset_len = len(assets)
 
         if asset_len <= 1:
-            if assets.get('Response code') or assets.get('Bad response'):
+            if assets.get("Response code") or assets.get("Bad response"):
                 raise Exception
 
-        print(f"{"NO.":<4} {"ASSET NAME":50} ASSET SIZE")
+        header = (
+            "\033[4;1m{num:<4}\033[0m \033[4;1m{name:50}\033[0m \033[4;1m{size:}\033[0m"
+        )
+        print(header.format(num="NO.", name="ASSET NAME", size="ASSET SIZE"))
 
         for asset in assets:
-            num = asset.get('asset_number')
-            name = asset.get('asset_name')
-            size = pretty_bytes.pretty_bytes(asset.get('asset_size'))
+            num = asset.get("asset_number")
+            name = asset.get("asset_name")
+            size = pretty_bytes.pretty_bytes(asset.get("asset_size"))
             recommend = ""
-            if asset.get('recommend'):
+            if asset.get("recommend"):
                 recommend = "\033[92m[RECOMMENDED]\033[0m"
-            print(f"{num:<4} {name:50} {size} {recommend}")
+            print(f"{num:<4} {name.ljust(50, '.')} {size} {recommend}")
 
         while True:
             try:
-                select_asset = int(input(f"\nPlease select an asset to download (1-{asset_len}): "))
-                
+                select_asset = int(
+                    input(f"\nPlease select an asset to download (1-{asset_len}): ")
+                )
+
                 match select_asset:
                     case 0:
-                        print("You are not a computer, count from 1 ~! (ｏ ‵-′)ノ”(ノ﹏<。)")
+                        print(
+                            "You are not a computer, count from 1 ~! (ｏ ‵-′)ノ”(ノ﹏<。)"
+                        )
                         continue
 
                 if select_asset > asset_len:
-                    print(f"There are only {asset_len} assets and you selected {select_asset}, why (´･ω･`)?")
+                    print(
+                        f"There are only {asset_len} assets and you selected {select_asset}, why (´･ω･`)?"
+                    )
                     continue
-                
+
                 asset_number = select_asset - 1
 
-                download_url = assets[asset_number].get('asset_download_url')
-                asset_filename = assets[asset_number].get('asset_name')
-                user_os = assets[asset_number].get('user_os')
+                download_url = assets[asset_number].get("asset_download_url")
+                asset_filename = assets[asset_number].get("asset_name")
+                user_os = assets[asset_number].get("user_os")
                 download_asset(download_url, asset_filename, user_os)
                 return
             except KeyboardInterrupt:
@@ -167,15 +190,17 @@ def list_assets(username: str, repo: str):
                 exit(1)
 
     except Exception:
-        response_code = assets.get('Response code')
+        response_code = assets.get("Response code")
         if response_code != 200 and response_code != None:
             match response_code:
                 case 404:
                     print("Resource not found.")
-            print("Looks like this repository does not have any releases or assets. (￣_￣|||)")
+            print(
+                "Looks like this repository does not have any releases or assets. (￣_￣|||)"
+            )
             return
-        elif assets.get('Bad response'):
-            response_msg = assets.get('Bad response')
+        elif assets.get("Bad response"):
+            response_msg = assets.get("Bad response")
         print(response_msg)
         return
 
@@ -194,26 +219,26 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
     """
     # Check whether user in on "Windows" OR "Linux"
     # and download to user's "Download" directory.
-    if user_os == 'windows':
-        download_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
-        progress_bar = '='
-    elif user_os == 'linux':
-        progress_bar = '#'
-        download_dir = os.path.expanduser('~/Downloads')
+    if user_os == "windows":
+        download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        progress_bar = "="
+    elif user_os == "linux":
+        progress_bar = "#"
+        download_dir = os.path.expanduser("~/Downloads")
 
     # Create a subdirectory inside user's "Download" directory.
     subdirectory = "HubPeeker"
     download_path = os.path.join(download_dir, subdirectory)
     os.makedirs(download_path, exist_ok=True)
-    
+
     # This is the path where the asset will be saved / downloaded.
     # "~/Downloads/HubPeeker/<asset_name>" OR "/home/<username>/Downloads/HubPeeker/<asset_name>" for Linux.
     # "C:\Users\<username>\Downloads\HubPeeker\<asset_name>" for Windows.
     file_path = os.path.join(download_path, filename)
-    
+
     response = requests.get(asset_download_url, stream=True)
     # Get the total file size
-    file_size = int(response.headers.get('Content-Length', 0))
+    file_size = int(response.headers.get("Content-Length", 0))
 
     # Start the timer to calculate ETA and stuff..
     start_time = time.time()
@@ -221,7 +246,7 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
     try:
         # Download the file with progress bar
         progress = 0
-        with open(file_path, 'wb') as fd:
+        with open(file_path, "wb") as fd:
             for chunk in response.iter_content(chunk_size=1024):
                 fd.write(chunk)
                 progress += len(chunk)
@@ -229,13 +254,17 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
                 elapsed_time = time.time() - start_time
                 eta = (file_size - progress) / progress * elapsed_time
                 # Print out the progress bar with ETA
-                print("\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds" % (
-                    pretty_bytes.pretty_bytes(progress),
-                    pretty_bytes.pretty_bytes(file_size),
-                    f'{progress_bar}'*int(progress*50/file_size),
-                    int(progress*100/file_size),
-                    eta
-                ), end='')
+                print(
+                    "\rDownloaded: %s / Total: %s [\033[92m%-50s\033[0m] %d%% - ETA: %ds\r"
+                    % (
+                        pretty_bytes.pretty_bytes(progress),
+                        pretty_bytes.pretty_bytes(file_size),
+                        f"{progress_bar}" * int(progress * 50 / file_size),
+                        int(progress * 100 / file_size),
+                        eta,
+                    ),
+                    end="",
+                )
 
             print()
             # Calculate the total time taken for the download
@@ -244,5 +273,7 @@ def download_asset(asset_download_url: str, filename: str, user_os: str):
         print(f"Downloaded asset can be found here: '{download_path}'")
         return "success"
     except KeyboardInterrupt:
-        print("\nDownload has been cancelled!\nNOTE: This application does not support the resumption of downloads. If you initiate a download again (even for the same asset), it will start from the beginning and overwrite any previously downloaded content.")
+        print(
+            "\nDownload has been cancelled!\nNOTE: This application does not support the resumption of downloads. If you initiate a download again (even for the same asset), it will start from the beginning and overwrite any previously downloaded content."
+        )
         return "failed"
