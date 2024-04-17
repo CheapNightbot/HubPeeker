@@ -57,11 +57,11 @@
 - Detect and suggest an asset based on the user's operating system and CPU architecture.
 - Show the asset size (in human-readable format using `base-2`).
 - User can select an asset and it will download the selected asset inside "HubPeeker" sub-directory to the user's "Download" directory.
+  - OR Users can specify the download directory.
 
 ## Planned / In Progress
 - [ ] Use local database (most likely **SQLite**) to track the downloaded version of each asset and compare downloaded version with the latest version on GitHub. (Likely to automate the download if there is new release).
 - [ ] Have ability to pause and resume the download of asset(s).
-- [x] Users can specify the download directory.
 - [ ] The end goal of this project is to automate the download of the asset(s) from the GitHub Releases once the user has downloaded an asset and there is new version/release for that asset is available.
 - [ ] Properly setup and maintain this repository !!
 
@@ -81,7 +81,8 @@ Thank you for your understanding!
 
 Make sure you have **Python 3.8** or higher installed on your system.
 
-- Clone the repository.
+- Clone the repository:
+  - `git clone https://github.com/CheapNightbot/HubPeeker.git`
 - [Create virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) and activate it. [Optional]
 - Run `python -m pip install -r requirements.txt`.
 - Change directory into `src` by `cd src`.
@@ -102,6 +103,7 @@ Options:
   -u, --username <USERNAME>   GitHub Username the repository belongs to.
   -r, --repo <REPO>           GitHub repository name (to download assets from)
   -i, --interactive           Enter interactive mode to input GitHub username and repository interactively.
+  -d, --directory <DIRECTORY> Specify the download directory. Default to user's 'Download' directory.
   -U, --update                Check for new version/release of already downloaded assets.
 ```
 
@@ -145,6 +147,19 @@ Options:
   * When providing this option, there is no need to provide any other options. Though, currently, it will not stop you from doing so, but yeah..
 
   * Example: `hub-peeker -i` or `hub-peeker --interactive`
+
+* `-d` or `--directory`: Directory flag/option followed by the directory path where the selected asset will be downloaded/saved.
+
+  * Example:
+
+    * `hub-peeker -d 'F:/GitHub/Assets'`
+    * `hub-peeker -directory 'C:/SomeFolder'`
+
+  * You may prefix `~` for your Home directory and `.` for the current directory (where the applicaion ran from):
+
+    * `hub-peeker -d '~/Desktop'`: will save asset to your Desktop.
+
+    * `hub-peeker -d './HubPeeker'`: will save asset to the current directory inside 'HubPeeker' sub-directory.
 
 * `-U` or `--update`: Currently, this one is useless. The purpose of this will be to check if our database file exists and if there are any asset downloaded before and if yes, we will check for the new version / release and prompt to download appropriate asset.
 
