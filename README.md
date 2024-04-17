@@ -41,7 +41,6 @@
 > This project is currently in the early stages of development.
 > > - It does not currently have ability to resume download.
 > > - There is no way to track the version of downloaded asset and check if there is new release availabe on GitHub. (Though, I had created `.json` file for it, but it was getting all over the place, so removed).
-> > - It downloads the asset to "HubPeeker" sub-directory inside user's "Download" directory by default and there is no way for user to specify it.
 
 <h1 align="center">
   <img src="docs/images/HubPeeker - FlowChart.png" />
@@ -62,7 +61,7 @@
 ## Planned / In Progress
 - [ ] Use local database (most likely **SQLite**) to track the downloaded version of each asset and compare downloaded version with the latest version on GitHub. (Likely to automate the download if there is new release).
 - [ ] Have ability to pause and resume the download of asset(s).
-- [ ] Users can specify the download directory.
+- [x] Users can specify the download directory.
 - [ ] The end goal of this project is to automate the download of the asset(s) from the GitHub Releases once the user has downloaded an asset and there is new version/release for that asset is available.
 - [ ] Properly setup and maintain this repository !!
 

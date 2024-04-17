@@ -1,6 +1,6 @@
 import argparse
-
-from utils import __version__, github_api
+from pathlib import Path
+from utils import __version__, github_api, json
 
 
 parser = argparse.ArgumentParser(
@@ -42,6 +42,12 @@ parser.add_argument(
     action="store_true",
 )
 parser.add_argument(
+    "-d",
+    "--directory",
+    metavar="<DIRECTORY_PATH>",
+    help="Specify the download directory. Default to user's 'Download' directory.",
+)
+parser.add_argument(
     "-U",
     "--update",
     help="Check for new version/release of already downloaded assets. [WIP]",
@@ -53,10 +59,24 @@ parser._optionals.title = "Options"
 args = parser.parse_args()
 
 
+def parse_config():
+    path = Path("./config.json")
+
+    try:
+        contents = path.read_text()
+    except FileNotFoundError:
+        return None
+    else:
+        config = json.loads(contents)
+        download_path = config["download_path"]
+        return download_path
+
+
 def main():
 
     username = args.username
     repo = args.repo
+    download_path = args.directory
 
     try:
 
@@ -68,12 +88,73 @@ def main():
             while not repo.isalnum():
                 repo = input("GitHub Repository Name: ")
 
+            download_dir = parse_config() if parse_config() else Path("~/Downloads/HubPeeker/").expanduser()
+            download_path = input(f"Download Directory PATH (Default to `{download_dir}`): ")
+            download_path = Path(download_path).expanduser()
+            if download_path:
+                save_path = input("Would you like save this path as default path for future downloads? [Y/N]: ")
+                if save_path.lower() == "y":
+                    path = Path("./config.json")
+                    config = {"download_path": f"{download_path}"}
+                    contents = json.dumps(config)
+                    path.write_text(contents)
+
+            else:
+                download_path = download_dir
+
         if username and repo and username.isalnum() and repo.isalnum():
             print(
                 f"Checking release assets for `https://github.com/{username}/{repo}`\n"
             )
 
-            github_api.list_assets(username, repo)
+            download_dir = parse_config() if parse_config() else Path("~/Downloads/HubPeeker/").expanduser()
+            download_path = Path(download_path).expanduser() if download_path else download_dir
+            if args.directory:
+                save_path = input("Would you like save this path as default path for future downloads? [Y/N]: ")
+                if save_path.lower() == "y":
+                    path = Path("./config.json")
+                    config = {"download_path": f"{download_path}"}
+                    contents = json.dumps(config)
+                    path.write_text(contents)
+
+            # 1
+            check_user_repo = github_api.validate_username_repo(username, repo)
+            if check_user_repo != 200:
+                print(check_user_repo.get("Bad response"))
+                return
+            
+            # 2
+            assets = github_api.fetch_assets(username, repo)
+            try:
+                asset_len = len(assets)
+
+                if asset_len <= 1:
+                    if assets.get("Response code") or assets.get("Bad response"):
+                        raise Exception
+                    
+                # 3
+                asset_number = github_api.list_assets(assets)
+                download_url = assets[asset_number].get("asset_download_url")
+                asset_filename = assets[asset_number].get("asset_name")
+                user_os = assets[asset_number].get("user_os")
+
+                #4
+                github_api.download_asset(download_url, asset_filename, user_os, download_path)
+
+            except Exception:
+                response_code = assets.get("Response code")
+                if response_code != 200 and response_code != None:
+                    match response_code:
+                        case 404:
+                            print("Resource not found.")
+                    print(
+                        "Looks like this repository does not have any releases or assets. (￣_￣|||)"
+                    )
+                    return
+                elif assets.get("Bad response"):
+                    response_msg = assets.get("Bad response")
+                print(response_msg)
+                return
 
         else:
             parser.exit(
