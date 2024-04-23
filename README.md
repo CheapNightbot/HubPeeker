@@ -103,7 +103,7 @@ Options:
   -u, --username <USERNAME>   GitHub Username the repository belongs to.
   -r, --repo <REPO>           GitHub repository name (to download assets from)
   -i, --interactive           Enter interactive mode to input GitHub username and repository interactively.
-  -d, --directory <DIRECTORY> Specify the download directory. Default to user's 'Download' directory.
+  -d, --dir <DIRECTORY>       Specify the download directory. Default to user's 'Download' directory.
   -U, --update                Check for new version/release of already downloaded assets.
 ```
 
@@ -148,12 +148,12 @@ Options:
 
   * Example: `hub-peeker -i` or `hub-peeker --interactive`
 
-* `-d` or `--directory`: Directory flag/option followed by the directory path where the selected asset will be downloaded/saved.
+* `-d` or `--dir`: Directory flag/option followed by the directory path where the selected asset will be downloaded/saved.
 
   * Example:
 
     * `hub-peeker -d 'F:/GitHub/Assets'`
-    * `hub-peeker -directory 'C:/SomeFolder'`
+    * `hub-peeker -dir 'C:/SomeFolder'`
 
   * You may prefix `~` for your Home directory and `.` for the current directory (where the applicaion ran from):
 
