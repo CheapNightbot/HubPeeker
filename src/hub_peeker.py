@@ -72,6 +72,10 @@ def parse_config():
         return download_path
 
 
+def is_valid_sting(string):
+    return bool(string and (string.isalnum() or not string.isspace()))
+
+
 def main():
 
     username = args.username
@@ -82,17 +86,25 @@ def main():
 
         if args.interactive:
             username = input("GitHub Username: ")
-            while not username.isalnum():
+            while not is_valid_sting(username):
                 username = input("GitHub Username: ")
             repo = input("GitHub Repository Name: ")
-            while not repo.isalnum():
+            while not is_valid_sting(repo):
                 repo = input("GitHub Repository Name: ")
 
-            download_dir = parse_config() if parse_config() else Path("~/Downloads/HubPeeker/").expanduser()
-            download_path = input(f"Download Directory PATH (Default to `{download_dir}`): ")
+            download_dir = (
+                parse_config()
+                if parse_config()
+                else Path("~/Downloads/HubPeeker/").expanduser()
+            )
+            download_path = input(
+                f"Download Directory PATH (Default to `{download_dir}`): "
+            )
             download_path = Path(download_path).expanduser()
             if download_path:
-                save_path = input("Would you like save this path as default path for future downloads? [Y/N]: ")
+                save_path = input(
+                    "Would you like save this path as default path for future downloads? [Y/N]: "
+                )
                 if save_path.lower() == "y":
                     path = Path("./config.json")
                     config = {"download_path": f"{download_path}"}
@@ -102,15 +114,23 @@ def main():
             else:
                 download_path = download_dir
 
-        if username and repo and username.isalnum() and repo.isalnum():
+        if is_valid_sting(username) and is_valid_sting(repo):
             print(
                 f"Checking release assets for `https://github.com/{username}/{repo}`\n"
             )
 
-            download_dir = parse_config() if parse_config() else Path("~/Downloads/HubPeeker/").expanduser()
-            download_path = Path(download_path).expanduser() if download_path else download_dir
+            download_dir = (
+                parse_config()
+                if parse_config()
+                else Path("~/Downloads/HubPeeker/").expanduser()
+            )
+            download_path = (
+                Path(download_path).expanduser() if download_path else download_dir
+            )
             if args.dir:
-                save_path = input("Would you like save this path as default path for future downloads? [Y/N]: ")
+                save_path = input(
+                    "Would you like save this path as default path for future downloads? [Y/N]: "
+                )
                 if save_path.lower() == "y":
                     path = Path("./config.json")
                     config = {"download_path": f"{download_path}"}
@@ -122,7 +142,7 @@ def main():
             if check_user_repo != 200:
                 print(check_user_repo.get("Bad response"))
                 return
-            
+
             # 2
             assets = github_api.fetch_assets(username, repo)
             try:
@@ -131,15 +151,17 @@ def main():
                 if asset_len <= 1:
                     if assets.get("Response code") or assets.get("Bad response"):
                         raise Exception
-                    
+
                 # 3
                 asset_number = github_api.list_assets(assets)
                 download_url = assets[asset_number].get("asset_download_url")
                 asset_filename = assets[asset_number].get("asset_name")
                 user_os = assets[asset_number].get("user_os")
 
-                #4
-                github_api.download_asset(download_url, asset_filename, user_os, download_path)
+                # 4
+                github_api.download_asset(
+                    download_url, asset_filename, user_os, download_path
+                )
 
             except Exception:
                 response_code = assets.get("Response code")
