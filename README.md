@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **Reason for Archive**: Even though it was great for learning, but in reality, it doesn't provide any value at all. So, I don't feel like wasting my only time working further on it.
+
+<hr />
+
 <div align="center">
 
 [![HubPeeker Banner](docs/images/hub-peeker_banner.png)](#) 
